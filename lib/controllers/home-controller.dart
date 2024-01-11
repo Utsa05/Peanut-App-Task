@@ -39,8 +39,14 @@ class HomeController extends GetxController {
           zipCode: "")
       .obs;
   var loadingData = false.obs;
+  var loadingTrade = false.obs;
 
-  void getUserAccountInformation() async {
+  void getAllData() {
+    getTrade();
+    _getUserAccountInformation();
+  }
+
+  void _getUserAccountInformation() async {
     try {
       loadingData(true);
 
@@ -51,8 +57,7 @@ class HomeController extends GetxController {
       userData.value = resposne;
       debugPrint(userData.value.name);
 
-      getTrade();
-      getUserPhoneNo();
+      _getUserPhoneNo();
       loadingData(false);
     } on SocketException {
       snackBar("OPS", "No Internet Connecion", AppTheme.redColor);
@@ -64,7 +69,7 @@ class HomeController extends GetxController {
     }
   }
 
-  void getUserPhoneNo() async {
+  void _getUserPhoneNo() async {
     RequestModel requestModel = RequestModel(
         token: _initialController.token.value,
         login: _initialController.login.value);
@@ -74,6 +79,7 @@ class HomeController extends GetxController {
   }
 
   void getTrade() async {
+    loadingTrade(true);
     RequestModel requestModel = RequestModel(
         token: _initialController.token.value,
         login: _initialController.login.value);
@@ -83,5 +89,6 @@ class HomeController extends GetxController {
 
     totalProfit.value =
         tradeList.fold(0, (sum, trade) => sum + trade.currentPrice);
+    loadingTrade(false);
   }
 }

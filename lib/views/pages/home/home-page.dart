@@ -21,46 +21,55 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.find<HomeController>().getUserAccountInformation();
+    Get.find<HomeController>().getAllData();
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: AppTheme.primaryColor,
           onPressed: () {
-            Get.bottomSheet(Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: AppSize.s80,
-                padding: const EdgeInsets.all(AppSize.s15),
-                decoration: BoxDecoration(
-                    color: AppTheme.whiteColor,
-                    borderRadius: BorderRadius.circular(10)),
-                child: Obx(() => Column(
-                      children: [
-                        PText(
-                          text: "Total Profit",
-                          color: themdata().primaryColor,
-                        ),
-                        box(2),
-                        PText(
-                            text: Get.find<HomeController>()
-                                .totalProfit
-                                .toStringAsFixed(4)),
-                      ],
-                    )),
-              ),
-            ));
+            totalProfitSheet();
           },
           label: const Icon(
             Icons.calculate,
             color: AppTheme.whiteColor,
           )),
-      body: const CustomScrollView(
-        slivers: <Widget>[
-          TopBar(),
-          TradeList(),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          Get.find<HomeController>().getTrade();
+        },
+        child: const CustomScrollView(
+          slivers: <Widget>[
+            TopBar(),
+            TradeList(),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<dynamic> totalProfitSheet() {
+    return Get.bottomSheet(Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: AppSize.s80,
+        padding: const EdgeInsets.all(AppSize.s15),
+        decoration: BoxDecoration(
+            color: AppTheme.whiteColor,
+            borderRadius: BorderRadius.circular(10)),
+        child: Obx(() => Column(
+              children: [
+                PText(
+                  text: "Total Profit",
+                  color: themdata().primaryColor,
+                ),
+                box(2),
+                PText(
+                    text: Get.find<HomeController>()
+                        .totalProfit
+                        .toStringAsFixed(4)),
+              ],
+            )),
+      ),
+    ));
   }
 }
 
@@ -73,7 +82,7 @@ class TradeList extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
     return Obx(() {
-      return controller.loadingData.isFalse
+      return controller.loadingTrade.isFalse
           ? SliverList(
               delegate: SliverChildBuilderDelegate(
                 (_, int index) {
@@ -82,13 +91,10 @@ class TradeList extends StatelessWidget {
                 childCount: controller.tradeList.length,
               ),
             )
-          : const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(18.0),
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.primaryColor,
-                  ),
+          : const SliverFillRemaining(
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: AppTheme.primaryColor,
                 ),
               ),
             );
@@ -150,7 +156,7 @@ class TradeListItem extends StatelessWidget {
                   color: themdata().primaryColor.withOpacity(0.2),
                 ),
                 child:
-                    PText(text: "\$${data.currentPrice.toStringAsFixed(4)}")),
+                    PText(text: "\$${data.currentPrice.toStringAsFixed(2)}")),
           ]),
         ),
       ),

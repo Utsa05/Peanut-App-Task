@@ -17,9 +17,6 @@ class LoginPage extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () async {
-        await Get.find<InitialController>().storage.deleteAll();
-      }),
       body: SizedBox(
         height: size().height,
         width: size().width,

@@ -26,7 +26,6 @@ class ApiService {
   Future<String> getFoutPhoneNo(RequestModel reques) async {
     var reponseBody = await postHttp(API.fourPhoneNoUrl, reques, false);
     String response = reponseBody as String;
-    print(reponseBody);
     return response;
   }
 
